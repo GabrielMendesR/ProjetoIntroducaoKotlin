@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/fragment_add"
+        android:icon="@drawable/ic_add_circle_24"
+        android:title="@string/title_add" />
+
+    <item
+        android:id="@+id/fragment_inicio"
+        android:icon="@drawable/ic_home_black_24dp"
+        android:title="@string/title_inicio" />
+
+    <item
+        android:id="@+id/fragment_historico"
+        android:icon="@drawable/ic_list_24"
+        android:title="@string/title_historico" />
+
+</menu>
