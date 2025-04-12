@@ -1,7 +1,11 @@
 package com.example.projetotrabalhofinal.ui.add
 
+import android.app.AlarmManager
 import android.app.DatePickerDialog
+import android.app.PendingIntent
 import android.app.TimePickerDialog
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -9,6 +13,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import com.example.projetotrabalhofinal.notification.EventNotificationReceiver
 import com.example.projetotrabalhofinal.databinding.FragmentAddBinding
 import com.example.projetotrabalhofinal.db.EventDbHelper
 import java.text.SimpleDateFormat
@@ -27,7 +32,9 @@ class AddFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentAddBinding.inflate(inflater, container, false)
+
         dbHelper = EventDbHelper(requireContext())
+
         return binding.root
     }
 
@@ -123,15 +130,38 @@ class AddFragment : Fragment() {
             val id = dbHelper.insertEvent(title, description, eventTime)
 
             if (id != -1L) {
-                showToast("Evento salvo com sucesso!")
+                scheduleNotification(id, title, description, eventTime)
                 clearFields()
                 findNavController().navigateUp()
             } else {
-                showToast("Erro ao salvar evento")
+                showToast("Erro ao Salvar Evento, Tente Mais Tarde")
             }
         } catch (e: Exception) {
             showToast("Erro: ${e.message}")
         }
+    }
+
+    private fun scheduleNotification(eventId: Long, title: String, description: String, triggerTime: Long) {
+        val intent = Intent(requireContext(), EventNotificationReceiver::class.java).apply {
+            putExtra("event_id", eventId)
+            putExtra("title", title)
+            putExtra("description", description)
+        }
+
+        val pendingIntent = PendingIntent.getBroadcast(
+            requireContext(),
+            eventId.toInt(),
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        val alarmManager = requireContext().getSystemService(Context.ALARM_SERVICE) as AlarmManager
+
+        alarmManager.setExactAndAllowWhileIdle(
+            AlarmManager.RTC_WAKEUP,
+            triggerTime,
+            pendingIntent
+        )
     }
 
     private fun clearFields() {
