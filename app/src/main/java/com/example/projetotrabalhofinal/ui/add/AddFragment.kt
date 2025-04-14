@@ -164,6 +164,22 @@ class AddFragment : Fragment() {
         )
     }
 
+    private fun cancelNotification(eventId: Long) {
+        val intent = Intent(requireContext(), EventNotificationReceiver::class.java)
+        val pendingIntent = PendingIntent.getBroadcast(
+            requireContext(),
+            eventId.toInt(),
+            intent,
+            PendingIntent.FLAG_NO_CREATE or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        pendingIntent?.let {
+            val alarmManager = requireContext().getSystemService(Context.ALARM_SERVICE) as AlarmManager
+            alarmManager.cancel(it)
+            it.cancel()
+        }
+    }
+
     private fun clearFields() {
         binding.editTextTitle.text.clear()
         binding.editTextDescription.text.clear()

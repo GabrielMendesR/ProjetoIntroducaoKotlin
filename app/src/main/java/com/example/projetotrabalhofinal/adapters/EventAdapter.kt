@@ -3,6 +3,7 @@ package com.example.projetotrabalhofinal.adapters
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageButton
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.projetotrabalhofinal.R
@@ -13,19 +14,26 @@ import java.util.Locale
 
 class EventAdapter(
     private val events: List<Event>,
-    private val onItemClick: (Event) -> Unit
+    private val onItemClick: (Event) -> Unit,
+    private val onDeleteClick: (Event) -> Unit // Nova callback para exclusão
 ) : RecyclerView.Adapter<EventAdapter.EventViewHolder>() {
 
     inner class EventViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        private val textTitle: TextView = itemView.findViewById(R.id.textTitle)
+        private val textDescription: TextView = itemView.findViewById(R.id.textDescription)
+        private val textDateTime: TextView = itemView.findViewById(R.id.textDateTime)
+        private val btnDelete: ImageButton = itemView.findViewById(R.id.btnDelete)
+
         fun bind(event: Event) {
-            itemView.findViewById<TextView>(R.id.textTitle).text = event.title
-            itemView.findViewById<TextView>(R.id.textDescription).text = event.description
+            textTitle.text = event.title
+            textDescription.text = event.description
 
             val sdf = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault())
             val dateString = sdf.format(Date(event.eventTime))
-            itemView.findViewById<TextView>(R.id.textDateTime).text = dateString
+            textDateTime.text = dateString
 
             itemView.setOnClickListener { onItemClick(event) }
+            btnDelete.setOnClickListener { onDeleteClick(event) }
         }
     }
 

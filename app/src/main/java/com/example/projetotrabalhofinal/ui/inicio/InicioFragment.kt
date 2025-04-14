@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.projetotrabalhofinal.adapters.EventAdapter
@@ -36,9 +37,22 @@ class InicioFragment : Fragment() {
         val events = dbHelper.cursorToEventList(cursor)
 
         binding.recyclerViewEvents.layoutManager = LinearLayoutManager(requireContext())
-        binding.recyclerViewEvents.adapter = EventAdapter(events) { event ->
-            // Click listener para os itens (opcional)
-        }
+        binding.recyclerViewEvents.adapter = EventAdapter(events,
+            { _ ->
+
+            },
+            { event ->
+                AlertDialog.Builder(requireContext())
+                    .setTitle("Confirmar exclusão")
+                    .setMessage("Deseja realmente excluir este evento?")
+                    .setPositiveButton("Excluir") { _, _ ->
+                        dbHelper.deleteEvent(requireContext(), event.id)
+                        loadUpcomingEvents()
+                    }
+                    .setNegativeButton("Cancelar", null)
+                    .show()
+            }
+        )
     }
 
     override fun onDestroyView() {

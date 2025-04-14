@@ -10,4 +10,5 @@
     <string name="time">Hora (HH:mm)</string>
     <string name="date">Data (dd/MM/yyyy)</string>
     <string name="past_events">Eventos Passados</string>
+    <string name="delete">Deletar</string>
 </resources>

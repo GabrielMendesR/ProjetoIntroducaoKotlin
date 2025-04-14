@@ -1,10 +1,14 @@
 package com.example.projetotrabalhofinal.db
 
+import android.app.AlarmManager
+import android.app.PendingIntent
 import android.content.ContentValues
 import android.content.Context
+import android.content.Intent
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
+import com.example.projetotrabalhofinal.notification.EventNotificationReceiver
 
 
 class EventDbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
@@ -45,6 +49,29 @@ class EventDbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME,
             put(COLUMN_EVENT_TIME, eventTime)
         }
         return db.insert(TABLE_EVENTS, null, values)
+    }
+
+    fun deleteEvent(context: Context, id: Long): Int {
+        val intent = Intent(context, EventNotificationReceiver::class.java)
+        val pendingIntent = PendingIntent.getBroadcast(
+            context,
+            id.toInt(),
+            intent,
+            PendingIntent.FLAG_NO_CREATE or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        pendingIntent?.let {
+            val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+            alarmManager.cancel(it)
+            it.cancel()
+        }
+
+        val db = writableDatabase
+        return db.delete(
+            TABLE_EVENTS,
+            "$COLUMN_ID = ?",
+            arrayOf(id.toString())
+        )
     }
 
     fun getUpcomingEvents(currentTime: Long): Cursor {
